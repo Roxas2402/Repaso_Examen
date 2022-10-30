@@ -2,9 +2,12 @@ package com.example.repaso_examen;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Toast;
 
+import com.example.repaso_examen.configuraciones.Constants;
 import com.example.repaso_examen.databinding.ActivityAddInmuebleBinding;
 import com.example.repaso_examen.modelos.Inmueble;
 
@@ -37,6 +40,18 @@ public class AddInmuebleActivity extends AppCompatActivity {
             public void onClick(View view) {
                 //8: Creamos un inmueble a partir de los datos introducidos en el diseño
                 Inmueble inmueble = crearInmueble();
+
+                //9: Creamos el bundle con el inmueble, si el inmueble está vacío, diremos que faltan datos
+                if (inmueble != null) {
+                    Bundle bundle = new Bundle();
+                    bundle.putSerializable(Constants.INMUEBLE, inmueble);
+                    Intent intent = new Intent();
+                    intent.putExtras(bundle);
+                    setResult(RESULT_OK, intent);
+                    finish();
+                } else {
+                    Toast.makeText(AddInmuebleActivity.this, "FALTAN DATOS", Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }
