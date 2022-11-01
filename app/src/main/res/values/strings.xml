@@ -17,4 +17,6 @@
     <string name="provincia">Provincia</string>
     <string name="cancelar">Cancelar</string>
     <string name="crear">Crear</string>
+    <string name="eliminar">Eliminar</string>
+    <string name="guardar">Guardar</string>
 </resources>

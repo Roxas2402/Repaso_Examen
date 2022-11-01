@@ -13,6 +13,13 @@
         android:theme="@style/Theme.Repaso_Examen"
         tools:targetApi="31">
         <activity
+            android:name=".EditInmuebleActivity"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
             android:name=".AddInmuebleActivity"
             android:exported="false">
             <meta-data

@@ -10,6 +10,7 @@ import com.google.android.material.snackbar.Snackbar;
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContract;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -27,14 +28,15 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
-    //TODO: CREAR EDITAR INMUEBLE
-
     //1: Creamos la clase Inmueble
     //1.01: Creamos la clase constantes
     //2: Creamos el ArrayList de Inmueble y el Intent
     private ArrayList<Inmueble> inmueblesList;
     private ActivityMainBinding binding;
     private ActivityResultLauncher<Intent> addInmuebleLauncher;
+    //12+1: Creamos el Intent de editar inmueble
+    private ActivityResultLauncher<Intent> editInmuebleLauncher;
+    //14: Creamos la actividad EditInmuebleActivity (con su respectiva clase) y la personalizamos
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +54,8 @@ public class MainActivity extends AppCompatActivity {
         //11: Inicializamos el launcher
         inicializaLaunchers();
 
-        //4: Configuramos el botón
+        //4: Creamos la actividad AddInmuebleActivity
+        //4.01: Configuramos el botón que nos llevará a la actividad AddInmuebleActivity
         binding.fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -94,12 +97,33 @@ public class MainActivity extends AppCompatActivity {
                 }
 
         );
+
+        //15: Configuramos el launcher de EditActivity
+        //15.01: Creamos la variable final POSICION, para saber la posición en la que está el inmueble (podemos haber creado 100 inmuebles)
+        //TODO: 15.02: Crear el evento de Click dentro de muestraInmueblesContenido()
+        editInmuebleLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                new ActivityResultCallback<ActivityResult>() {
+                    @Override
+                    public void onActivityResult(ActivityResult result) {
+                        if (result.getResultCode() == RESULT_OK) {
+                            if (result.getData() != null && result.getData().getExtras() != null) {
+                                Inmueble inmueble = (Inmueble) result.getData().getExtras().getSerializable(Constants.INMUEBLE);
+                                int posicion = result.getData().getExtras().getInt(Constants.POSICION);
+                                inmueblesList.set(posicion, inmueble);
+                                muestraInmueblesContenido();
+                            }
+                        }
+                    }
+                }
+        );
     }
 
     private void muestraInmueblesContenido() {
         //12.01: Creamos el ScrollView en el content_main.xml y renombramos la cosa esa rara en el activity_main.xml
         binding.contentMain.contenedor.removeAllViews();
 
+        //Por cada inmueble guardado en la lista, crearemos una "vista" con los datos del inmueble
         for (int i = 0; i < inmueblesList.size(); i++) {
             Inmueble inmueble = inmueblesList.get(i);
 
@@ -116,6 +140,20 @@ public class MainActivity extends AppCompatActivity {
             lblCiudad.setText(inmueble.getCiudad());
             lblProvincia.setText(inmueble.getProvincia());
             rbValoracion.setRating(inmueble.getValoracion());
+
+            //15.02: Creamos el evento de Click
+            int finalI = i;
+            inmuebleView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(MainActivity.this, EditInmuebleActivity.class);
+                    Bundle bundle = new Bundle();
+                    bundle.putSerializable(Constants.INMUEBLE, inmueble);
+                    bundle.putInt(Constants.POSICION, finalI);
+                    intent.putExtras(bundle);
+                    editInmuebleLauncher.launch(intent);
+                }
+            });
 
             binding.contentMain.contenedor.addView(inmuebleView);
 
